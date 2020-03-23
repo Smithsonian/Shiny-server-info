@@ -5,12 +5,14 @@ library(shiny)
 library(dplyr)
 library(DT)
 
+#Get servername
+source("settings.R")
 
 #UI ----
 ui <- fluidPage(
   
   # App title ----
-  titlePanel("si-shiny.si.edu - Internal Shiny Server"),
+  titlePanel(paste0(hostname, " - Internal Shiny Server")),
   hr(),
  
   #Instructions for users ----
