@@ -16,23 +16,29 @@ ui <- fluidPage(
   hr(),
  
   #Instructions for users ----
-  fluidRow(column(width=8, 
+  fluidRow(column(width=9, 
+          img(src="shiny120.png", style="float: right;"),
           p("This", a(href = "https://shiny.rstudio.com/", "Shiny"), "server is set up with the", a(href = "http://docs.rstudio.com/shiny-server/#host-per-user-application-directories", "'Host Per-User Application Directories'"), " option."),
           p("For instructions on how to get an account, deploy apps, or get help, please check the ", a(href = "https://confluence.si.edu/display/RSHINY", "R/Shiny"), " Confluence site."),
-          p("This page is a Shiny app."),
-          p("Source is available at Github: ", a(href = "https://github.com/Smithsonian/Shiny-server-info", img(src="GitHub-Mark-32px.png"))),
-          p("v 1.0"),
+          p("This page is a Shiny app. Source is available at Github: ", a(href = "https://github.com/Smithsonian/Shiny-server-info", img(src="GitHub-Mark-32px.png"))),
+          p("v 1.1"),
           
           #Table with system-wide packages installed
+          hr(),
           h3("installed.packages(.Library)"),
+          p("Packages installed on the server:"),
           DT::dataTableOutput("packages")
   ),
-  column(width=4, 
-         img(src="SI-f5xccl1.png", style="display: block; margin-left: 0px;"),
+  column(width=3, 
+
+         #Shiny server version
+         uiOutput("shinyver"),
+         hr(),
          
          #rversion
          h3("R.Version()"),
          tableOutput("rversion"))
+         
   )
 )
 
@@ -44,6 +50,22 @@ server <- function(input, output) {
     rinfo <- unlist(R.Version())
     as.data.frame(unlist(R.Version()))
   }, rownames = TRUE, colnames = FALSE)
+  
+  
+  output$shinyver <- renderUI({
+    shiny_ver <- try(system('shiny-server --version', intern = TRUE))
+    
+    req(class(shiny_ver) != "try-error")
+    
+    tagList(
+      h3("Shiny Server version"),
+      HTML("<ul>"),
+      HTML(paste(unlist(paste0("<li>", shiny_ver, "</li>")), collapse = "")),
+      HTML("</ul>")
+    )
+  })
+    
+  
   
   #Render table of packages ----
   output$packages <- DT::renderDataTable({
